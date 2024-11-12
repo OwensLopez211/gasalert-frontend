@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+# GasAlert Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Breve descripción del proyecto y su propósito.
 
-## Available Scripts
+## Características
 
-In the project directory, you can run:
+- Lista de las principales funcionalidades o características del front-end.
+- Por ejemplo:
+  - Inicio de sesión y registro de usuarios.
+  - Dashboard para monitorear tanques de combustible.
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tecnologías utilizadas
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Menciona las principales tecnologías, librerías y herramientas utilizadas en el desarrollo del front-end:
+  - React
+  - React Router
+  - Axios
+  - Tailwind CSS
+  - shadcn/ui components
+  - etc.
 
-### `npm test`
+## Instalación y ejecución
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Proporciona instrucciones claras sobre cómo instalar y ejecutar el proyecto localmente:
 
-### `npm run build`
+1. Clona el repositorio:
+```
+git clone https://github.com/OwensLopez211/gasalert-frontend.git
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Instala las dependencias:
+```
+cd gasalert-frontend
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Inicia el servidor de desarrollo:
+```
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Abre el navegador y accede a `http://localhost:3000`
 
-### `npm run eject`
+## Estructura del proyecto
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Describe brevemente la estructura de carpetas y archivos del proyecto, explicando la función de cada una de las partes más importantes.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Contribución
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Si el proyecto está abierto a contribuciones, incluye información sobre cómo hacerlo:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- Cómo reportar errores o solicitar nuevas características.
+- Cómo enviar pull requests.
+- Lineamientos de estilo de código, pruebas, etc.
 
-## Learn More
+## Licencia
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Indica la licencia bajo la cual se distribuye el proyecto.
