@@ -1,22 +1,46 @@
-// frontend/gasalert-frontend/src/services/AuthService.jsx
-
 import axios from 'axios';
+
+const API_URL = 'http://localhost:8000/api';
 
 const AuthService = {
   login: async (username, password) => {
     try {
-      const response = await axios.post('/auth/login/', { username, password });
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-      return response.data;
+      const response = await axios.post(`${API_URL}/auth/login/`, {
+        username,
+        password,
+      });
+      
+      if (response.data.access) {
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
+        
+        // Configurar el token en los headers de axios para futuras peticiones
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+        
+        // Obtener información del usuario
+        const userResponse = await axios.get(`${API_URL}/users/me/`);
+        localStorage.setItem('user', JSON.stringify(userResponse.data));
+        
+        return userResponse.data;
+      }
+      
+      return null;
     } catch (error) {
-      throw error;
+      console.error('Login error:', error);
+      throw error.response?.data || { message: 'Error en el servidor' };
     }
   },
 
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    delete axios.defaults.headers.common['Authorization'];
+  },
+
+  getCurrentUser: () => {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   },
 
   getAccessToken: () => {
@@ -30,6 +54,40 @@ const AuthService = {
   isAuthenticated: () => {
     return !!localStorage.getItem('access_token');
   },
+  
+  // Configurar interceptor para refrescar el token
+  setupAxiosInterceptors: () => {
+    axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          
+          try {
+            const refreshToken = AuthService.getRefreshToken();
+            const response = await axios.post(`${API_URL}/auth/refresh/`, {
+              refresh: refreshToken
+            });
+            
+            const { access } = response.data;
+            localStorage.setItem('access_token', access);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+            originalRequest.headers['Authorization'] = `Bearer ${access}`;
+            
+            return axios(originalRequest);
+          } catch (refreshError) {
+            AuthService.logout();
+            window.location.href = '/login';
+            return Promise.reject(refreshError);
+          }
+        }
+        
+        return Promise.reject(error);
+      }
+    );
+  }
 };
 
 export default AuthService;
