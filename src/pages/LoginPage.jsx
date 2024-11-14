@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
@@ -7,6 +8,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const { login, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // para acceder al mensaje de redirección
+  const inactivityMessage = location.state?.message;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -44,6 +47,14 @@ const LoginPage = () => {
             <p className="text-white text-base font-normal leading-normal pb-3 pt-1 px-4">
               Inicia sesión para monitorear tus tanques de combustible y recibir alertas.
             </p>
+            
+            {/* Mensaje de sesión expirada por inactividad */}
+            {inactivityMessage && (
+              <div className="mx-4 mb-4 p-4 bg-blue-500 text-white rounded-xl">
+                {inactivityMessage}
+              </div>
+            )}
+            
             {error && (
               <div className="mx-4 mb-4 p-4 bg-red-500 text-white rounded-xl">
                 {error}
@@ -55,7 +66,9 @@ const LoginPage = () => {
                 </button>
               </div>
             )}
+
             <form onSubmit={handleLogin}>
+              {/* Input de usuario y contraseña */}
               <div className="flex max-w-md flex-wrap items-end gap-4 px-4 py-3">
                 <label htmlFor="username" className="flex flex-col min-w-40 flex-1">
                   <p className="text-white text-base font-medium leading-normal pb-2">Usuario</p>

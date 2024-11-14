@@ -113,6 +113,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
   const clearError = () => setError(null);
 
   const value = {

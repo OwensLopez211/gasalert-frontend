@@ -19,9 +19,20 @@ const AuthService = {
         
         // Obtener información del usuario
         const userResponse = await axios.get(`${API_URL}/users/me/`);
-        localStorage.setItem('user', JSON.stringify(userResponse.data));
+        const userData = userResponse.data;
         
-        return userResponse.data;
+        // Obtener las estaciones a las que tiene acceso el usuario
+        const stationResponse = await axios.get(`${API_URL}/estaciones/`, {
+          headers: {
+            Authorization: `Bearer ${response.data.access}`,
+          },
+        });
+        userData.estaciones = stationResponse.data;
+
+        // Guardar la información del usuario y estaciones en localStorage
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        return userData;
       }
       
       return null;
@@ -30,6 +41,7 @@ const AuthService = {
       throw error.response?.data || { message: 'Error en el servidor' };
     }
   },
+
 
   logout: () => {
     localStorage.removeItem('access_token');

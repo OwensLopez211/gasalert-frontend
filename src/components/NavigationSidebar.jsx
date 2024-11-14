@@ -1,3 +1,4 @@
+// NavigationSidebar.jsx
 import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 
 const NavigationSidebar = () => {
+  console.log("Rendering NavigationSidebar");
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useContext(AuthContext);
@@ -55,7 +57,7 @@ const NavigationSidebar = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-64 bg-slate-800 text-white p-4">
+    <div className="flex flex-col h-screen w-64 p-4 text-white" style={{ backgroundColor: '#111517' }}>
       <div className="mb-8">
         <h1 className="text-xl font-bold">GasAlert</h1>
       </div>
