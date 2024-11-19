@@ -5,7 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 import Layout from '../layouts/Layout';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
-/* import TanksPage from '../pages/TanksPage';
+import TanksPage from '../pages/TanksPage';
+/* 
 import AlertsPage from '../pages/AlertsPage';
 import MaintenancePage from '../pages/MaintenancePage';
 import ReportsPage from '../pages/ReportsPage';
@@ -22,7 +23,8 @@ const AppRoutes = () => {
       {isAuthenticated && (
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
-{/*           <Route path="tanks" element={<TanksPage />} />
+          <Route path="tanks" element={<TanksPage />} />
+{/*    
           <Route path="alerts" element={<AlertsPage />} />
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />
