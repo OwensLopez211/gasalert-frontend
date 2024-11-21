@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
-import UmbralForm from "../components/UmbralForm";
+import TankAnalysis from "../components/TankAnalysis";
 
 const TanksPage = () => {
   const [tanks, setTanks] = useState([]);
@@ -24,12 +24,12 @@ const TanksPage = () => {
       }
 
       try {
-        const token = localStorage.getItem("access_token"); // Obtén el token
+        const token = localStorage.getItem("access_token");
         const response = await axios.get(
           `http://localhost:8000/api/tanks?estacion_id=${estacionId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Incluye el token en los encabezados
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -40,7 +40,7 @@ const TanksPage = () => {
         console.error("Error fetching tanks:", err);
         if (err.response && err.response.status === 401) {
           alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
-          navigate("/login"); // Redirige al inicio de sesión
+          navigate("/login");
         } else {
           setError("No se pudieron cargar los tanques.");
         }
@@ -55,75 +55,74 @@ const TanksPage = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4 text-white">Tanques</h1>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6 text-white">Tanques</h1>
 
+      {/* Mostrar lista de tanques si no hay un tanque seleccionado */}
       {!selectedTank && (
-        <table className="table-auto w-full text-left text-white border-collapse">
-          <thead>
-            <tr className="bg-gray-800">
-              <th className="py-2 px-4 border-b border-gray-700">Nombre</th>
-              <th className="py-2 px-4 border-b border-gray-700">Capacidad Total</th>
-              <th className="py-2 px-4 border-b border-gray-700">Nivel Actual</th>
-              <th className="py-2 px-4 border-b border-gray-700">Estado</th>
-              <th className="py-2 px-4 border-b border-gray-700">Última Actualización</th>
-              <th className="py-2 px-4 border-b border-gray-700">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tanks.map((tank) => (
-              <tr key={tank.id} className="border-b border-gray-700">
-                <td className="py-3 px-4">{tank.nombre}</td>
-                <td className="py-3 px-4">
-                  {tank.capacidad_total?.toLocaleString("es-ES")} L
-                </td>
-                <td className="py-3 px-4">
-                  {tank.ultima_lectura?.nivel
-                    ? `${tank.ultima_lectura.nivel.toFixed(1)}%`
-                    : "Sin datos"}
-                </td>
-                <td className="py-3 px-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-sm font-semibold ${
-                      tank.estado === "normal"
-                        ? "bg-green-500"
-                        : tank.estado === "bajo"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }`}
-                  >
-                    {tank.estado}
-                  </span>
-                </td>
-                <td className="py-3 px-4">
-                  {tank.ultima_lectura?.fecha
-                    ? new Date(tank.ultima_lectura.fecha).toLocaleString("es-ES")
-                    : "Sin datos"}
-                </td>
-                <td className="py-3 px-4">
-                  <button
-                    className="text-blue-500 hover:underline"
-                    onClick={() => setSelectedTank(tank)} // Seleccionar tanque
-                  >
-                    Configurar Umbrales
-                  </button>
-                </td>
+        <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-md">
+          <table className="table-auto w-full text-left text-white">
+            <thead>
+              <tr className="bg-gray-900 text-gray-400">
+                <th className="py-3 px-6">Nombre</th>
+                <th className="py-3 px-6">Capacidad Total</th>
+                <th className="py-3 px-6">Nivel Actual</th>
+                <th className="py-3 px-6">Estado</th>
+                <th className="py-3 px-6">Última Actualización</th>
+                <th className="py-3 px-6">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tanks.map((tank) => (
+                <tr
+                  key={tank.id}
+                  className="border-t border-gray-700 hover:bg-gray-700 transition-colors"
+                >
+                  <td className="py-4 px-6">{tank.nombre}</td>
+                  <td className="py-4 px-6">
+                    {tank.capacidad_total?.toLocaleString("es-ES")} L
+                  </td>
+                  <td className="py-4 px-6">
+                    {tank.ultima_lectura?.nivel
+                      ? `${tank.ultima_lectura.nivel.toFixed(1)}%`
+                      : "Sin datos"}
+                  </td>
+                  <td className="py-4 px-6">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${
+                        tank.estado === "normal"
+                          ? "bg-green-500 text-white"
+                          : tank.estado === "bajo"
+                          ? "bg-yellow-500 text-black"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {tank.estado}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6">
+                    {tank.ultima_lectura?.fecha
+                      ? new Date(tank.ultima_lectura.fecha).toLocaleString("es-ES")
+                      : "Sin datos"}
+                  </td>
+                  <td className="py-4 px-6">
+                    <button
+                      className="text-blue-400 hover:text-blue-600 font-medium underline"
+                      onClick={() => setSelectedTank(tank)} // Seleccionar tanque
+                    >
+                      Ver Análisis
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
+      {/* Mostrar análisis del tanque seleccionado */}
       {selectedTank && (
-        <div>
-          <button
-            className="text-blue-500 hover:underline mb-4"
-            onClick={() => setSelectedTank(null)} // Regresar a la lista
-          >
-            ← Volver a la lista de tanques
-          </button>
-          <UmbralForm tank={selectedTank} />
-        </div>
+        <TankAnalysis tank={selectedTank} onBack={() => setSelectedTank(null)} />
       )}
     </div>
   );

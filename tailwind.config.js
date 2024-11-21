@@ -6,10 +6,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        customDark: '#111517',
+        customDark: '#0D1117', // Color del fondo del Dashboard
+        dashboardBackground: '#111517', // Fondo oscuro principal (usado como en tu LoginPage)
+        gray950: '#1F2937', // Alternativa para el fondo actual del Dashboard
       },
     },
   },
-  plugins: [],
-}
-
+  plugins: [
+    require("tailwind-scrollbar-hide"), // Para ocultar scrollbars cuando sea necesario
+  ],
+};

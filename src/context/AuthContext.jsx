@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService';
-
+import Loader from '../components/Loader';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -128,7 +128,13 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!isLoading && children}
+      {isLoading ? (
+        <div className="flex justify-center items-center min-h-screen bg-gray-950">
+          <Loader /> {/* Usa el componente Loader */}
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
-  );
+  );  
 };

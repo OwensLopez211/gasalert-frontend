@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import AppRoutes from './routes/AppRoutes';
 import useIdleTimeout from './hooks/useIdleTimeout';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
@@ -10,6 +12,22 @@ const App = () => {
       <AuthProvider>
         <IdleTimeoutWrapper />
         <AppRoutes />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark" // Tema oscuro para coincidir con tu interfaz
+          toastStyle={{
+            backgroundColor: '#1F2937', // Gris oscuro
+            color: '#FFFFFF' // Texto blanco
+          }}
+        />
       </AuthProvider>
     </BrowserRouter>
   );
