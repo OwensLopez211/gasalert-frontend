@@ -8,15 +8,21 @@ import {
   Wrench,
   FileText,
   User,
+  Menu,
+  X,
 } from 'lucide-react';
+import NotificationBell from './NotificationBell';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
-  const [openMenu, setOpenMenu] = useState(null); // Estado para controlar cuál menú está abierto
+  const [openMenu, setOpenMenu] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useContext(AuthContext);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const navItems = [
     { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
@@ -25,62 +31,17 @@ const Navbar = () => {
     { path: '/reports', icon: <FileText size={20} />, label: 'Reportes' },
   ];
 
+  // Cerrar menú móvil al navegar
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          console.error('Token de autenticación no encontrado');
-          return;
-        }
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
-        const response = await fetch('http://localhost:8000/api/alerts/notificaciones/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  // ... (resto del código de WebSocket y notificaciones)
 
-        if (!response.ok) {
-          throw new Error('Error al obtener las notificaciones');
-        }
-
-        const data = await response.json();
-        setNotifications(data);
-        const unread = data.filter((n) => !n.leido).length;
-        setUnreadCount(unread);
-      } catch (error) {
-        console.error('Error al obtener las notificaciones:', error);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
-
-  const markAsRead = async (id) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        console.error('Token de autenticación no encontrado');
-        return;
-      }
-
-      await fetch(`http://localhost:8000/api/alerts/notificaciones/${id}/`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, leido: true } : n
-        )
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error('Error al marcar la notificación como leída:', error);
-    }
+  const handleNavigation = (path) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
+    setOpenMenu(null);
   };
 
   const handleLogout = async () => {
@@ -104,19 +65,28 @@ const Navbar = () => {
             </span>
           </div>
 
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden p-2 rounded-full text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]/50 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
           {/* Navigation - Desktop */}
-          <nav className="hidden lg:flex flex-1 justify-center">
-            <div className="flex items-center gap-1 bg-[#1a1d21]/50 rounded-full p-1 backdrop-blur-sm">
+          <nav className="hidden lg:flex flex-1 justify-start"> {/* Cambiado de justify-center a justify-start */}
+            <div className="flex items-start gap-1 bg-[#1a1d21]/50 rounded-full p-1 backdrop-blur-sm">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
                   <button
                     key={item.path}
-                    onClick={() => navigate(item.path)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all
-                      ${isActive 
-                        ? 'bg-[#2d3137] text-[#60A5FA] shadow-inner' 
-                        : 'text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]/50'}`}
+                    onClick={() => handleNavigation(item.path)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-[#2d3137] text-[#60A5FA] shadow-inner'
+                        : 'text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]/50'
+                    }`}
                   >
                     {item.icon}
                     <span>{item.label}</span>
@@ -127,60 +97,22 @@ const Navbar = () => {
           </nav>
 
           {/* Actions Section */}
-          <div className="flex items-center gap-2">
-
-            {/* Notifications */}
+          <div className="hidden lg:flex items-center gap-2 relative">
+            {/* Notification Bell and Dropdown */}
             <div className="relative">
-              <button
-                onClick={() =>
-                  setOpenMenu(openMenu === 'notifications' ? null : 'notifications')
-                }
-                className="p-2 rounded-full text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]/50 transition-colors"
-              >
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-[#3B82F6] text-white text-xs font-bold flex items-center justify-center rounded-full">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notifications Dropdown */}
-              {openMenu === 'notifications' && (
-                <div className="absolute right-0 mt-2 w-80 overflow-hidden bg-[#1a1d21] rounded-2xl border border-[#2d3137] shadow-lg">
-                  <div className="p-4 border-b border-[#2d3137]">
-                    <h3 className="font-semibold text-white">Notificaciones</h3>
-                  </div>
-                  <div className="max-h-[320px] overflow-y-auto">
-                    {notifications.length > 0 ? (
-                      notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => markAsRead(n.id)}
-                          className={`p-4 cursor-pointer border-b border-[#2d3137] last:border-none transition-colors
-                            ${n.leido 
-                              ? 'text-gray-400 hover:bg-[#2d3137]/50' 
-                              : 'text-white hover:bg-[#2d3137]'}`}
-                        >
-                          <p className="text-sm">{n.message}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-gray-400 text-sm text-center">
-                        No hay notificaciones
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <NotificationBell onClick={() => setDropdownOpen(!isDropdownOpen)} />
+              {isDropdownOpen && (
+                <NotificationDropdown
+                  isOpen={isDropdownOpen}
+                  onClose={() => setDropdownOpen(false)}
+                />
               )}
             </div>
 
             {/* Profile Menu */}
             <div className="relative">
               <button
-                onClick={() =>
-                  setOpenMenu(openMenu === 'profile' ? null : 'profile')
-                }
+                onClick={() => setOpenMenu(openMenu === 'profile' ? null : 'profile')}
                 className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]/50 transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#60A5FA] to-[#3B82F6] flex items-center justify-center">
@@ -193,10 +125,7 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-48 overflow-hidden bg-[#1a1d21] rounded-2xl border border-[#2d3137] shadow-lg">
                   <div className="py-2">
                     <button
-                      onClick={() => {
-                        navigate('/settings');
-                        setOpenMenu(null);
-                      }}
+                      onClick={() => handleNavigation('/settings')}
                       className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-[#2d3137] transition-colors"
                     >
                       Configuración
@@ -211,7 +140,56 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
 
+        {/* Mobile Menu */}
+        <div className={`lg:hidden transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? 'max-h-screen opacity-100'
+            : 'max-h-0 opacity-0 pointer-events-none'
+        }`}>
+          <div className="px-4 py-2 space-y-2 bg-[#1a1d21]/95 backdrop-blur-lg border-t border-[#2d3137]">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavigation(item.path)}
+                  className={`flex items-start w-full px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-[#2d3137] text-[#60A5FA] shadow-inner'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </div>
+                </button>
+              );
+            })}
+            
+            <div className="pt-2 border-t border-[#2d3137]">
+              <button
+                onClick={() => handleNavigation('/settings')}
+                className="flex items-start w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-[#1f2227]"
+              >
+                <div className="flex items-center gap-3">
+                  <User size={20} />
+                  <span>Configuración</span>
+                </div>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-start w-full px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-[#1f2227]"
+              >
+                <div className="flex items-center gap-3">
+                  <User size={20} />
+                  <span>Cerrar sesión</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>

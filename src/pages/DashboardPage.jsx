@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TankHistoricalChart from '../components/TanksChart';
 import TankStatusIndicator from '../components/TankStatusIndicator';
+import RecentAlerts from '../components/RecentAlerts';
 import axios from 'axios';
 
 function DashboardPage() {
@@ -56,9 +57,14 @@ function DashboardPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-6 max-w-7xl">
-      <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-6">
-        Dashboard de Monitoreo
-      </h1>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+          Dashboard de Monitoreo
+        </h1>
+        <p className="text-gray-400 mt-2">
+          Monitorea en tiempo real el estado de tus tanques y alertas del sistema
+        </p>
+      </div>
 
       {/* Sección Principal - Grid Responsivo */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -109,22 +115,7 @@ function DashboardPage() {
 
       {/* Cards Inferiores */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        <div className={`${neumorphicClass} p-6`}>
-          <h3 className="text-white text-base md:text-lg font-semibold mb-4">
-            Alertas Recientes
-          </h3>
-          <ul className="text-gray-300 text-sm space-y-3">
-            <li className="p-3 rounded-xl bg-[#1a1d21] shadow-[inset_-3px_3px_6px_#151719,inset_3px_-3px_6px_#1f2329]">
-              ⚠️ Tanque 93 - Nivel Crítico
-            </li>
-            <li className="p-3 rounded-xl bg-[#1a1d21] shadow-[inset_-3px_3px_6px_#151719,inset_3px_-3px_6px_#1f2329]">
-              ⚠️ Tanque Diesel - Bajo Nivel
-            </li>
-            <li className="p-3 rounded-xl bg-[#1a1d21] shadow-[inset_-3px_3px_6px_#151719,inset_3px_-3px_6px_#1f2329]">
-              ✅ Tanque MVP - Operando Normalmente
-            </li>
-          </ul>
-        </div>
+        <RecentAlerts limit={3} className="h-full" />
 
         <div className={`${neumorphicClass} p-6`}>
           <h3 className="text-white text-base md:text-lg font-semibold mb-4">
@@ -155,6 +146,8 @@ function DashboardPage() {
               Operación Normal en 2 Tanques
             </p>
           </div>
+
+          
         </div>
       </div>
     </div>

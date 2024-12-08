@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext, useCallback, useMemo } from "re
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import ThresholdConfig from "./ThresholdConfig";
+import FuelAnalysisPage from "../pages/FuelAnalysisPage";
+import { useNavigate } from 'react-router-dom';
 
 const TankStatusDisplay = () => {
   const { user } = useContext(AuthContext);
@@ -10,14 +12,22 @@ const TankStatusDisplay = () => {
   const [error, setError] = useState(null);
   const [showThresholdConfig, setShowThresholdConfig] = useState(false);
   const [selectedTankId, setSelectedTankId] = useState(null);
+  const [showTankAnalysis, setShowTankAnalysis] = useState(false);
+  const navigate = useNavigate();
 
   const estacionId = user?.estaciones?.[0]?.id;
+  
+  const handleAnalysis = (tankId) => {
+    navigate(`/analysis/${tankId}`);
+  };
+
 
   const api = useMemo(() => axios.create({
     baseURL: "http://localhost:8000/api",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
+    withCredentials: true // Añadir esto
   }), []);
 
   const fetchTanks = useCallback(async () => {
@@ -44,7 +54,7 @@ const TankStatusDisplay = () => {
           ? { ...tank, ultima_lectura: lectura }
           : tank
       )
-    );
+    );    
   }, []);
 
   useEffect(() => {
@@ -52,28 +62,54 @@ const TankStatusDisplay = () => {
   }, [fetchTanks]);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8001/ws/tank_status/");
-
-    socket.onopen = () => {
-      console.log("Conexión WebSocket establecida");
+    let ws;
+    const connectWebSocket = () => {
+      // Usar consistentemente el puerto 8001 para WebSocket
+      ws = new WebSocket("ws://localhost:8001/ws/tank_status/");
+      
+      // Agregar el token de autorización en la conexión WebSocket
+      ws.onopen = () => {
+        console.log("WebSocket conectado");
+        // Enviar token de autenticación
+        ws.send(JSON.stringify({
+          type: 'authenticate',
+          token: localStorage.getItem('access_token')
+        }));
+      };
+  
+      ws.onmessage = (event) => {
+        /* console.log("Datos recibidos:", event.data); */   // en caso de querer ver el log de los datos recibidos
+        try {
+          const data = JSON.parse(event.data);
+          if (data.tank_id && data.ultima_lectura) {
+            updateTankData(data.tank_id, data.ultima_lectura);
+          }
+        } catch (error) {
+          console.error("Error procesando mensaje:", error);
+        }
+      };
+  
+      ws.onerror = (error) => {
+        console.error("Error en WebSocket:", error);
+      };
+  
+      ws.onclose = (event) => {
+        console.log("WebSocket desconectado", event.code, event.reason);
+        // Solo intentar reconectar si no fue un cierre limpio
+        if (event.code !== 1000) {
+          console.log("Intentando reconectar...");
+          setTimeout(connectWebSocket, 3000);
+        }
+      };
     };
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "tank_reading" || !data.type) {
-        updateTankData(data.tank_id, data.ultima_lectura);
+  
+    connectWebSocket();
+  
+    return () => {
+      if (ws) {
+        ws.close();
       }
     };
-
-    socket.onerror = (error) => {
-      console.error("Error en WebSocket:", error);
-    };
-
-    socket.onclose = () => {
-      console.log("Conexión WebSocket cerrada");
-    };
-
-    return () => socket.close();
   }, [updateTankData]);
 
   const formatNumber = (number) => {
@@ -221,30 +257,52 @@ const TankStatusDisplay = () => {
                 </div>
               </div>
 
-              {/* Botón de Configuración */}
-              <button
-                onClick={() => {
+              <div className="flex flex-col gap-2 mt-4">
+                {/* Botón de Configuración */}
+                <button
+                  onClick={() => {
                     setSelectedTankId(tank.id);
                     setShowThresholdConfig(true);
                   }}                  
-                className={`
-                  mt-auto
-                  w-full
-                  py-2
-                  rounded-xl
-                  font-medium
-                  text-sm
-                  transition-all
-                  duration-300
-                  bg-gradient-to-br from-[#3B82F6] to-[#2563EB] 
-                  text-white
-                  shadow-[4px_4px_8px_#151719,-4px_-4px_8px_#1f2329]
-                  hover:shadow-[6px_6px_12px_#151719,-6px_-6px_12px_#1f2329]
-                  hover:from-[#2563EB] hover:to-[#1D4ED8]
-                `}
-              >
-                Configurar
-              </button>
+                  className={`
+                    w-full
+                    py-2
+                    rounded-xl
+                    font-medium
+                    text-sm
+                    transition-all
+                    duration-300
+                    bg-gradient-to-br from-[#3B82F6] to-[#2563EB] 
+                    text-white
+                    shadow-[4px_4px_8px_#151719,-4px_-4px_8px_#1f2329]
+                    hover:shadow-[6px_6px_12px_#151719,-6px_-6px_12px_#1f2329]
+                    hover:from-[#2563EB] hover:to-[#1D4ED8]
+                  `}
+                >
+                  Configurar
+                </button>
+
+                {/* Botón de Análisis */}
+                <button
+                  onClick={() => handleAnalysis(tank.id)}
+                  className={`
+                    w-full
+                    py-2
+                    rounded-xl
+                    font-medium
+                    text-sm
+                    transition-all
+                    duration-300
+                    bg-gradient-to-br from-[#2563EB] to-[#1D4ED8]
+                    text-white
+                    shadow-[4px_4px_8px_#151719,-4px_-4px_8px_#1f2329]
+                    hover:shadow-[6px_6px_12px_#151719,-6px_-6px_12px_#1f2329]
+                    hover:from-[#1D4ED8] hover:to-[#1E40AF]
+                  `}
+                >
+                  Ver Análisis
+                </button>
+              </div>
             </div>
           );
         })}
@@ -259,6 +317,7 @@ const TankStatusDisplay = () => {
           }}
         />
       )}
+
 
     <style jsx>{`
         .liquid-container {

@@ -6,11 +6,15 @@ import Layout from '../layouts/Layout';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
 import TanksPage from '../pages/TanksPage';
+import FuelAnalysisPage from '../pages/FuelAnalysisPage';
+import ReportsPage from '../pages/ReportsPage';
+
 /* 
 import AlertsPage from '../pages/AlertsPage';
 import MaintenancePage from '../pages/MaintenancePage';
 import ReportsPage from '../pages/ReportsPage';
 import SettingsPage from '../pages/SettingsPage'; */
+
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -24,12 +28,16 @@ const AppRoutes = () => {
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="tanks" element={<TanksPage />} />
+          <Route path="/analysis/:tankId?" element={<FuelAnalysisPage />} />
+          <Route path="reports" element={<ReportsPage />} />
 {/*    
           <Route path="alerts" element={<AlertsPage />} />
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} /> */}
           <Route path="*" element={<Navigate to="/dashboard" />} />
+
+          
         </Route>
       )}
 
