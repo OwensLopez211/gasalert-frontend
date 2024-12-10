@@ -3,6 +3,8 @@ import { DropletIcon } from 'lucide-react';
 import axios from 'axios';
 import LoaderAnalysis from './LoaderAnalysis';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const AverageConsumption = ({ tanqueId, dias }) => {
   const [promedio, setPromedio] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ const AverageConsumption = ({ tanqueId, dias }) => {
 
         // Configuración del cliente Axios
         const api = axios.create({
-          baseURL: 'http://localhost:8000/api',
+          baseURL: `${API_URL}`,
           headers: { Authorization: `Bearer ${token}` },
         });
 

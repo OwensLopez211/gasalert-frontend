@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const TankAnalysis = ({ tankId, onClose }) => {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ const TankAnalysis = ({ tankId, onClose }) => {
       try {
         const token = localStorage.getItem("access_token");
         const response = await axios.get(
-          `http://localhost:8000/api/tanks/analytics/${tankId}/detail/`,
+          `${API_URL}/tanks/analytics/${tankId}/detail/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

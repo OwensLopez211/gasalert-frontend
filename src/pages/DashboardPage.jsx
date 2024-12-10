@@ -28,7 +28,7 @@ function DashboardPage() {
     const fetchTanks = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_URL}/api/tanks/`, {
+        const response = await axios.get(`${API_URL}/tanks/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

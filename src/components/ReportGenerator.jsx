@@ -1,6 +1,8 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const ReportGenerator = ({
   reportType,
   dateRange,
@@ -13,7 +15,7 @@ const ReportGenerator = ({
     try {
       setLoading(true);
       const token = localStorage.getItem('access_token');
-      const url = `http://localhost:8000/api/reports/${reportType}/?range=${dateRange}`;
+      const url = `${API_URL}/reports/${reportType}/?range=${dateRange}`;
 
       const response = await fetch(url, {
         method: 'GET',

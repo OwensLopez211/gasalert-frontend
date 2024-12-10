@@ -5,6 +5,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useCallback } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 const TankHistoricalChart = ({ range = "24h" }) => {
   const { user } = useContext(AuthContext);
@@ -32,7 +33,6 @@ const TankHistoricalChart = ({ range = "24h" }) => {
     []
   );
   
-
   const generateTankConfig = useCallback(
     (tanks) => {
       const config = {};
@@ -52,7 +52,7 @@ const TankHistoricalChart = ({ range = "24h" }) => {
   const api = useMemo(
     () =>
       axios.create({
-        baseURL: "http://localhost:8000/api",
+        baseURL: `${API_URL}`,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },

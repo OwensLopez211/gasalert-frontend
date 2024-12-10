@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import TrendDetectionService from '../services/TrendDetectionService';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_URL = process.env.REACT_APP_API_URL;
 
 const useTrendAlerts = (tankId, timeRange = '24h') => {
   const [alerts, setAlerts] = useState([]);

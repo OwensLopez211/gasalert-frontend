@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CalendarIcon } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const PredictionReposition = ({ tanqueId }) => {
   const [capacidadTotal, setCapacidadTotal] = useState(null);
   const [nivelActual, setNivelActual] = useState(null);
@@ -19,7 +21,7 @@ const PredictionReposition = ({ tanqueId }) => {
       try {
         const token = localStorage.getItem('access_token');
         const api = axios.create({
-          baseURL: 'http://localhost:8000/api',
+          baseURL: `${API_URL}`,
           headers: { Authorization: `Bearer ${token}` },
         });
 

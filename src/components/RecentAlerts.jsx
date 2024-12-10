@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const RecentAlerts = ({ limit = 3, className = '' }) => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ const RecentAlerts = ({ limit = 3, className = '' }) => {
     const fetchAlerts = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/alerts/alertas/', {
+        const response = await axios.get(`${API_URL}/alerts/alertas/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

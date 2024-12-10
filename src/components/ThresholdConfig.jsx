@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const ThresholdConfig = ({ tankId, onClose }) => {
   const [thresholds, setThresholds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ const ThresholdConfig = ({ tankId, onClose }) => {
   };
 
   const api = useMemo(() => axios.create({
-    baseURL: "http://localhost:8000/api",
+    baseURL: `${API_URL}`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,

@@ -8,6 +8,8 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import PredictionReposition from '../components/PredictionReposition';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const FuelAnalysisPage = () => {
   const location = useLocation();
   const { range = "7d" } = location.state || {};
@@ -26,7 +28,7 @@ const FuelAnalysisPage = () => {
       setLoadingTanks(true);
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/tanks/mis_tanques/', {
+        const response = await axios.get(`${API_URL}/tanks/mis_tanques/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

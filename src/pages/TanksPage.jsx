@@ -4,6 +4,8 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import TankAnalysis from "../components/TankAnalysis";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const TanksPage = () => {
   const [tanks, setTanks] = useState([]);
   const [selectedTank, setSelectedTank] = useState(null); // Tanque seleccionado
@@ -26,7 +28,7 @@ const TanksPage = () => {
       try {
         const token = localStorage.getItem("access_token");
         const response = await axios.get(
-          `http://localhost:8000/api/tanks?estacion_id=${estacionId}`,
+          `${API_URL}/tanks?estacion_id=${estacionId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

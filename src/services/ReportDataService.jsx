@@ -2,10 +2,12 @@
 
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 class ReportDataService {
   constructor() {
     this.api = axios.create({
-      baseURL: 'http://localhost:8000/api',
+      baseURL: `${API_URL}`,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },

@@ -16,7 +16,7 @@ export const NotificationProvider = ({ children }) => {
           return;
         }
   
-        const response = await fetch('http://localhost:8000/api/alerts/notificaciones/', {
+        const response = await fetch(`${API_URL}/alerts/notificaciones/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -112,7 +112,7 @@ export const NotificationProvider = ({ children }) => {
         throw new Error('Token de autenticación no encontrado');
       }
 
-      const response = await fetch(`http://localhost:8000/api/alerts/notificaciones/${notificationId}/`, {
+      const response = await fetch(`${API_URL}/alerts/notificaciones/${notificationId}/`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,

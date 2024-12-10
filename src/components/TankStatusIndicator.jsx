@@ -6,6 +6,8 @@ import FuelAnalysisPage from "../pages/FuelAnalysisPage";
 import { useNavigate } from 'react-router-dom';
 import Loader from "./Loader";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const TankStatusDisplay = () => {
   const { user } = useContext(AuthContext);
   const [tanks, setTanks] = useState([]);
@@ -30,7 +32,7 @@ const TankStatusDisplay = () => {
 
 
   const api = useMemo(() => axios.create({
-    baseURL: "http://localhost:8000/api",
+    baseURL: `${API_URL}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },

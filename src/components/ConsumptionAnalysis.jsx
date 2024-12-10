@@ -12,6 +12,8 @@ import {
 import { format, parseISO } from 'date-fns';
 import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 // Subcomponente para métricas clave
 const MetricCard = ({ title, value, description, icon: Icon, iconColor }) => (
   <div className="bg-[#1a1d21] p-4 rounded-xl border border-[#232529]">
@@ -36,7 +38,7 @@ const ConsumptionAnalysis = ({ tanqueId, range = '7d' }) => {
       try {
         const token = localStorage.getItem('access_token');
         const response = await fetch(
-          `http://localhost:8000/api/tanks/analytics/${tanqueId}/tendencia_consumo/?range=${range}`,
+          `${API_URL}/tanks/analytics/${tanqueId}/tendencia_consumo/?range=${range}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
