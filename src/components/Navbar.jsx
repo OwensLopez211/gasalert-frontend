@@ -26,8 +26,6 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-    { path: '/tanks', icon: <Container size={20} />, label: 'Tanques' },
-    { path: '/maintenance', icon: <Wrench size={20} />, label: 'Mantenimiento' },
     { path: '/reports', icon: <FileText size={20} />, label: 'Reportes' },
   ];
 
@@ -55,14 +53,19 @@ const Navbar = () => {
         <div className="flex items-center justify-between px-4 lg:px-8 h-16">
           {/* Logo Section */}
           <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="Logo GasAlert"
-              className="h-16 w-16 object-contain"
-            />
-            <span className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#60A5FA] to-[#3B82F6]">
-              GasAlert
-            </span>
+            <button
+              onClick={() => handleNavigation('/dashboard')}
+              className="flex items-center gap-2 text-left"
+            >
+              <img
+                src="/logo.png"
+                alt="Logo GasAlert"
+                className="h-16 w-16 object-contain"
+              />
+              <span className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#60A5FA] to-[#3B82F6]">
+                GasAlert
+              </span>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -74,7 +77,7 @@ const Navbar = () => {
           </button>
 
           {/* Navigation - Desktop */}
-          <nav className="hidden lg:flex flex-1 justify-start"> {/* Cambiado de justify-center a justify-start */}
+          <nav className="hidden lg:flex flex-1 justify-center"> {/* Cambiado de justify-center a justify-start */}
             <div className="flex items-start gap-1 bg-[#1a1d21]/50 rounded-full p-1 backdrop-blur-sm">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;

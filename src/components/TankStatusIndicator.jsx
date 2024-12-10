@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import ThresholdConfig from "./ThresholdConfig";
 import FuelAnalysisPage from "../pages/FuelAnalysisPage";
 import { useNavigate } from 'react-router-dom';
+import Loader from "./Loader";
 
 const TankStatusDisplay = () => {
   const { user } = useContext(AuthContext);
@@ -18,8 +19,14 @@ const TankStatusDisplay = () => {
   const estacionId = user?.estaciones?.[0]?.id;
   
   const handleAnalysis = (tankId) => {
-    navigate(`/analysis/${tankId}`);
+    navigate(`/analysis/${tankId}`, { 
+      state: {
+        tankId,   // Pasar el ID del tanque seleccionado
+        range: "7d", // Configurar el rango predeterminado o dinámico si lo tienes
+      },
+    });  
   };
+  
 
 
   const api = useMemo(() => axios.create({
@@ -33,7 +40,7 @@ const TankStatusDisplay = () => {
   const fetchTanks = useCallback(async () => {
     if (!estacionId) {
       setError("No se encontró una estación asociada.");
-      setLoading(false);
+      setLoading(true);
       return;
     }
 
@@ -43,7 +50,7 @@ const TankStatusDisplay = () => {
       setLoading(false);
     } catch (err) {
       setError("No se pudieron cargar los tanques");
-      setLoading(false);
+      setLoading(true);
     }
   }, [estacionId, api]);
 
@@ -156,7 +163,14 @@ const TankStatusDisplay = () => {
     };
   };
 
-  if (loading) return <div className="text-white">Cargando...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40"> {/* Ajusta la altura si es necesario */}
+        <Loader />
+      </div>
+    );
+  }
+  
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (

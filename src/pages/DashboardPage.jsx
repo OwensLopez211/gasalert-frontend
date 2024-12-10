@@ -3,12 +3,18 @@ import TankHistoricalChart from '../components/TanksChart';
 import TankStatusIndicator from '../components/TankStatusIndicator';
 import RecentAlerts from '../components/RecentAlerts';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+// Obtén la URL base de la API desde las variables de entorno
+const API_URL = process.env.REACT_APP_API_URL;
 
 function DashboardPage() {
   const [selectedTanks, setSelectedTanks] = useState([]);
   const [timeRange, setTimeRange] = useState('24h');
   const [tanks, setTanks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   const ranges = [
     { value: '6h', label: 'Últimas 6 horas' },
@@ -22,7 +28,7 @@ function DashboardPage() {
     const fetchTanks = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/tanks/', {
+        const response = await axios.get(`${API_URL}/api/tanks/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -45,6 +51,16 @@ function DashboardPage() {
       } else {
         return [...prev, tankId].sort();
       }
+    });
+  };
+
+  const handleViewAnalysis = (tankId) => {
+    // Navegar a la página FuelAnalysisPage con el tanque seleccionado y rango
+    navigate(`/fuel-analysis`, {
+      state: {
+        tankId,
+        range: timeRange,
+      },
     });
   };
 
@@ -77,6 +93,7 @@ function DashboardPage() {
       tanks={tanks}
       onTankSelect={handleTankSelect}
       selectedTanks={selectedTanks}
+      onViewAnalysis={handleViewAnalysis} // Pasar función al indicador
     />
   </div>
 
@@ -117,7 +134,13 @@ function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         <RecentAlerts limit={3} className="h-full" />
 
-        <div className={`${neumorphicClass} p-6`}>
+        {/* Órdenes Pendientes */}
+        <div className={`${neumorphicClass} p-6 relative`}>
+          {/* Fondo superpuesto con mensaje */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10">
+            <span className="text-white text-xl font-bold">En proceso, no es parte del MVP</span>
+          </div>
+
           <h3 className="text-white text-base md:text-lg font-semibold mb-4">
             Órdenes Pendientes
           </h3>
@@ -131,7 +154,13 @@ function DashboardPage() {
           </ul>
         </div>
 
-        <div className={`${neumorphicClass} p-6 md:col-span-2 xl:col-span-1`}>
+        {/* Resumen General */}
+        <div className={`${neumorphicClass} p-6 md:col-span-2 xl:col-span-1 relative`}>
+          {/* Fondo superpuesto con mensaje */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10">
+            <span className="text-white text-xl font-bold">En proceso, no es parte del MVP</span>
+          </div>
+
           <h3 className="text-white text-base md:text-lg font-semibold mb-4">
             Resumen General
           </h3>
@@ -146,9 +175,8 @@ function DashboardPage() {
               Operación Normal en 2 Tanques
             </p>
           </div>
-
-          
         </div>
+
       </div>
     </div>
   );

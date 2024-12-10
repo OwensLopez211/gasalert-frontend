@@ -5,7 +5,6 @@ import { useAuth } from '../hooks/useAuth';
 import Layout from '../layouts/Layout';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
-import TanksPage from '../pages/TanksPage';
 import FuelAnalysisPage from '../pages/FuelAnalysisPage';
 import ReportsPage from '../pages/ReportsPage';
 
@@ -27,8 +26,7 @@ const AppRoutes = () => {
       {isAuthenticated && (
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="tanks" element={<TanksPage />} />
-          <Route path="/analysis/:tankId?" element={<FuelAnalysisPage />} />
+          <Route path="/analysis/:tankId" element={<FuelAnalysisPage />} />
           <Route path="reports" element={<ReportsPage />} />
 {/*    
           <Route path="alerts" element={<AlertsPage />} />
