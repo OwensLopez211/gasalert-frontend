@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const API_URL = process.env.REACT_APP_API_URL;
+const WS_URL = process.env.REACT_APP_WS_URL;
 
 const NotificationContext = createContext();
 
@@ -47,7 +48,7 @@ export const NotificationProvider = ({ children }) => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
-    const socket = new WebSocket(`ws://localhost:8001/ws/alerts/?token=${token}`);
+    const socket = new WebSocket(`${WS_URL}/alerts/?token=${token}`);
 
     socket.onmessage = (event) => {
       const newNotification = JSON.parse(event.data);
