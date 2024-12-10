@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Loader from "./Loader";
 
 const API_URL = process.env.REACT_APP_API_URL;
+const WS_URL = process.env.REACT_APP_WS_URL;
 
 const TankStatusDisplay = () => {
   const { user } = useContext(AuthContext);
@@ -74,7 +75,7 @@ const TankStatusDisplay = () => {
     let ws;
     const connectWebSocket = () => {
       // Usar consistentemente el puerto 8001 para WebSocket
-      ws = new WebSocket("ws://localhost:8001/ws/tank_status/");
+      ws = new WebSocket(`${WS_URL}/tank_status/`);
       
       // Agregar el token de autorización en la conexión WebSocket
       ws.onopen = () => {
