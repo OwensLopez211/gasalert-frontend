@@ -22,7 +22,7 @@ const useTrendAlerts = (tankId, timeRange = '24h') => {
         const token = localStorage.getItem('access_token');
         
         // Usar la URL base correcta
-        const response = await axios.get(`${API_BASE_URL}/tanks/analytics/nivel_historico/`, {
+        const response = await axios.get(`${API_URL}/tanks/analytics/nivel_historico/`, {
           params: {
             tanque_id: tankId,
             range: timeRange

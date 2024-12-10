@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
