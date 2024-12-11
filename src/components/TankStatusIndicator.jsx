@@ -5,6 +5,7 @@ import ThresholdConfig from "./ThresholdConfig";
 import FuelAnalysisPage from "../pages/FuelAnalysisPage";
 import { useNavigate } from 'react-router-dom';
 import Loader from "./Loader";
+import './TankIndicator.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
 const WS_URL = process.env.REACT_APP_WS_URL;
@@ -160,9 +161,9 @@ const TankStatusDisplay = () => {
       dark: "#D97706"
     };
     return {
-      base: "#EF4444",
-      light: "#F87171",
-      dark: "#DC2626"
+      base: "#FF5A5A",     // Rojo más suave
+      light: "#FF6B6B",    // Rojo claro más cercano al base
+      dark: "#FF4444"      // Rojo oscuro más cercano al base
     };
   };
 
@@ -194,6 +195,7 @@ const TankStatusDisplay = () => {
               key={tank.id}
               className={`
                 flex flex-col
+                min-h-[520px]
                 p-4
                 rounded-2xl
                 bg-[#1f2227]
@@ -203,15 +205,16 @@ const TankStatusDisplay = () => {
                 transition-all duration-300
               `}
             >
+            
               {/* Header con Nombre del Tanque */}
-              <div className="mb-4 text-center">
-                <h3 className="text-white font-semibold text-lg">
+              <div className="h-[60px] flex items-center justify-center">
+                <h3 className="text-white font-semibold text-lg text-center">
                   {tank.nombre}
                 </h3>
               </div>
 
               {/* Contenedor del Indicador */}
-              <div className="flex justify-center mb-4">
+              <div className="h-[160px] flex justify-center items-center">
                 <div className="relative inline-block">
                   <div
                     className="relative bg-[#292d35] rounded-2xl overflow-hidden mx-auto"
@@ -227,7 +230,7 @@ const TankStatusDisplay = () => {
                         </div>
                       </div>
                     ) : (
-                        <div
+                      <div
                         className="liquid-container"
                         style={{
                           position: 'absolute',
@@ -235,8 +238,9 @@ const TankStatusDisplay = () => {
                           left: 0,
                           right: 0,
                           height: `${nivel}%`,
-                          background: `linear-gradient(to bottom, ${colors.light}, ${colors.base})`,
+                          background: `linear-gradient(to bottom, ${colors.light} 10%, ${colors.base} 90%)`, // Ajustando los porcentajes del gradiente
                           transition: 'height 0.8s ease-in-out',
+                          borderRadius: '0'
                         }}
                       >
                         <div className="wave-top">
@@ -256,7 +260,7 @@ const TankStatusDisplay = () => {
               </div>
 
               {/* Información de Nivel y Volumen */}
-              <div className="flex flex-col items-center gap-2 mb-4">
+              <div className="h-[140px] flex flex-col items-center justify-center gap-2">
                 <div className="text-center">
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                     {nivel.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
@@ -273,8 +277,9 @@ const TankStatusDisplay = () => {
                   Capacidad: {formatNumber(tank.capacidad_total)} L
                 </div>
               </div>
+          
 
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="flex flex-col gap-2 mt-auto">
                 {/* Botón de Configuración */}
                 <button
                   onClick={() => {
@@ -336,84 +341,7 @@ const TankStatusDisplay = () => {
       )}
 
 
-    <style jsx>{`
-        .liquid-container {
-            overflow: hidden;
-            border-radius: 16px;
-            position: relative;
-        }
-
-        .wave-top {
-            position: absolute;
-            top: -2px; /* Ajustado para que se vea mejor la transición */
-            left: 0;
-            right: 0;
-            height: 10px;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .wave-curve {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 400%; /* Aumentado para tener más espacio para la animación */
-            height: 100%;
-            background: inherit;
-            transform-origin: 0 50%;
-            animation: waveAnimation 8s linear infinite;
-        }
-
-        .wave-curve::before,
-        .wave-curve::after {
-            content: "";
-            position: absolute;
-            width: 25%; /* 100% / 4 */
-            height: 100%;
-            top: 0;
-            background-image: radial-gradient(circle at 50% 0%, transparent 25%, currentColor 25%);
-            background-size: 50px 20px;
-            background-repeat: repeat-x;
-            animation: bobbing 3s ease-in-out infinite alternate;
-        }
-
-        .wave-curve::after {
-            left: 25%;
-            background-position: 25px 0;
-            opacity: 0.7;
-            animation-delay: -1.5s;
-        }
-
-        .wave2 {
-            top: 2px;
-            animation: waveAnimation 10s linear infinite;
-            opacity: 0.5;
-        }
-
-        .wave2::before,
-        .wave2::after {
-            animation-delay: -2s;
-            animation-duration: 4s;
-        }
-
-        @keyframes waveAnimation {
-            0% {
-            transform: translateX(0);
-            }
-            100% {
-            transform: translateX(-50%);
-            }
-        }
-
-        @keyframes bobbing {
-            0%, 100% {
-            transform: translateY(-1px);
-            }
-            50% {
-            transform: translateY(1px);
-            }
-        }
-    `}</style>
+    
     </div>
   );
 };

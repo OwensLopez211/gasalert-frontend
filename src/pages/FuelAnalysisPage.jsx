@@ -145,7 +145,7 @@ const FuelAnalysisPage = () => {
           <h2 className="text-lg font-semibold text-white mb-4">Patrones de Reabastecimiento</h2>
           <div className="h-[300px]">
             {/* Fondo superpuesto con mensaje */}
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10 rounded-2xl">
               <span className="text-white text-xl font-bold">En proceso, no es parte del MVP</span>
             </div>
 
