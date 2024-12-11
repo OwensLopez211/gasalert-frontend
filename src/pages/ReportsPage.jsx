@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { FileText, Calendar } from 'lucide-react';
 import ReportTypeSelector from '../components/ReportTypeSelector';
 import DateRangeSelector from '../components/DateRangeSelector';
-import ReportGenerator from '../components/ReportGenerator';
 import ReportSummary from '../components/ReportSummary';
-import axios from 'axios';
+import ReportGenerator from '../components/reports/ReportGenerator'; // Ajusta el path si es necesario
 
 const ReportsPage = () => {
   const [reportType, setReportType] = useState('pdf');
@@ -16,27 +15,28 @@ const ReportsPage = () => {
     try {
       setLoading(true);
 
-      // Convertir rango de fechas a parámetros de inicio y fin
+      // Instanciar ReportGenerator
+      const generator = new ReportGenerator();
+
+      // Convertir rango de fechas
       const { startDate, endDate } = parseDateRange(dateRange);
 
-      const response = await axios.get(`/reports/${reportType}/`, {
-        params: {
-          tanque_id: 1, // Reemplazar con lógica para obtener el tanque deseado
-          fecha_inicio: startDate,
-          fecha_fin: endDate,
-        },
-        responseType: 'blob',
-      });
+      // Parámetros para el reporte
+      const params = {
+        tanque_id: 1, // Reemplazar con lógica para obtener el tanque deseado
+        fecha_inicio: startDate,
+        fecha_fin: endDate,
+      };
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Generar y descargar el reporte
+      const pdfBytes = await generator.generateReport(params);
+
+      // Crear enlace para descargar el PDF
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute(
-        'download',
-        `reporte_${reportType}.${
-          reportType === 'pdf' ? 'pdf' : reportType === 'excel' ? 'xlsx' : 'csv'
-        }`
-      );
+      link.setAttribute('download', 'reporte.pdf');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -44,7 +44,7 @@ const ReportsPage = () => {
       setLastGenerated(new Date());
     } catch (error) {
       console.error('Error al generar el reporte:', error);
-      alert('No se pudo generar el reporte. Verifica los parámetros y vuelve a intentar.');
+      alert('No se pudo generar el reporte. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -113,13 +113,13 @@ const ReportsPage = () => {
       </div>
 
       <div className={`${neumorphicClass} p-6 text-center`}>
-        <ReportGenerator
-          reportType={reportType}
-          dateRange={dateRange}
-          loading={loading}
-          onGenerateReport={handleGenerateReport}
-          lastGenerated={lastGenerated}
-        />
+        <button
+          onClick={handleGenerateReport}
+          disabled={loading}
+          className={`btn ${loading ? 'btn-disabled' : 'btn-primary'}`}
+        >
+          {loading ? 'Generando...' : 'Generar Reporte'}
+        </button>
       </div>
 
       <ReportSummary neumorphicClass={neumorphicClass} />

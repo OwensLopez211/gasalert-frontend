@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import axios from 'axios';
 
-class PDFReportGenerator {
+class ReportGenerator {
   constructor() {
     this.doc = null;
     this.currentPage = null;
@@ -31,26 +31,32 @@ class PDFReportGenerator {
   }
 
   async generateReport(params) {
-    // Fetch data from backend
-    const data = await this.fetchReportData(params);
-    await this.initialize();
+    try {
+      // Fetch data from backend
+      const data = await this.fetchReportData(params);
+      await this.initialize();
 
-    // Header Section
-    await this.addHeader();
+      // Header Section
+      await this.addHeader();
 
-    // Dynamic Sections
-    if (data.summary) await this.addExecutiveSummary(data.summary);
-    if (data.tanks) await this.addTankStatusSection(data.tanks);
-    if (data.alerts) await this.addAlertsSection(data.alerts);
-    if (data.consumption) await this.addConsumptionAnalysis(data.consumption);
-    if (data.metrics) await this.addPerformanceMetrics(data.metrics);
-    if (data.trends) await this.addTrendsSection(data.trends);
-    if (data.recommendations) await this.addRecommendations(data.recommendations);
+      // Dynamic Sections
+      if (data.summary) await this.addExecutiveSummary(data.summary);
+      if (data.tanks) await this.addTankStatusSection(data.tanks);
+      if (data.alerts) await this.addAlertsSection(data.alerts);
+      if (data.consumption) await this.addConsumptionAnalysis(data.consumption);
+      if (data.metrics) await this.addPerformanceMetrics(data.metrics);
+      if (data.trends) await this.addTrendsSection(data.trends);
+      if (data.recommendations) await this.addRecommendations(data.recommendations);
 
-    // Footer
-    await this.addFooter();
+      // Footer
+      await this.addFooter();
 
-    return await this.doc.save();
+      // Return the PDF as a Uint8Array
+      return await this.doc.save();
+    } catch (error) {
+      console.error('Error generating report:', error);
+      throw new Error('Error al generar el reporte.');
+    }
   }
 
   async fetchReportData(params) {
@@ -104,7 +110,7 @@ class PDFReportGenerator {
       Eficiencia operativa: ${summary.efficiency}%
     `;
 
-    this.addWrappedText(summaryText, 12);
+    await this.addWrappedText(summaryText, 12);
   }
 
   async addTankStatusSection(tanks) {
@@ -151,7 +157,7 @@ class PDFReportGenerator {
   }
 
   async addRecommendations(recommendations) {
-    this.addBulletList('Recomendaciones', recommendations);
+    await this.addBulletList('Recomendaciones', recommendations);
   }
 
   async addFooter() {
@@ -170,10 +176,46 @@ class PDFReportGenerator {
 
   async addWrappedText(text, fontSize, maxWidth = 500) {
     // Implementation for text wrapping
+    const lines = this.splitTextIntoLines(text, maxWidth);
+    lines.forEach((line) => {
+      this.currentPage.drawText(line, {
+        x: this.margins.left,
+        y: this.yOffset,
+        size: fontSize,
+        font: this.regularFont,
+      });
+      this.yOffset -= fontSize + 5;
+    });
+  }
+
+  splitTextIntoLines(text, maxWidth) {
+    // Logic for splitting text into lines
+    return text.split(/\n/); // Basic implementation (replace with word-wrap logic if needed)
   }
 
   async addTable(headers, rows, options = {}) {
-    // Implementation for creating tables
+    // Implementation for creating tables (simplified)
+    let y = this.yOffset;
+    headers.forEach((header, index) => {
+      this.currentPage.drawText(header, {
+        x: this.margins.left + index * 100,
+        y,
+        size: 12,
+        font: this.boldFont,
+      });
+    });
+    y -= 20;
+    rows.forEach((row) => {
+      row.forEach((cell, index) => {
+        this.currentPage.drawText(cell, {
+          x: this.margins.left + index * 100,
+          y,
+          size: 10,
+          font: this.regularFont,
+        });
+      });
+      y -= 15;
+    });
   }
 
   async addAlertsStats(alertsByPriority) {
@@ -209,4 +251,4 @@ class PDFReportGenerator {
   }
 }
 
-export default PDFReportGenerator;
+export default ReportGenerator;
