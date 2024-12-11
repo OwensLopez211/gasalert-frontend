@@ -1,4 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import axios from 'axios';
 
 class PDFReportGenerator {
   constructor() {
@@ -9,7 +10,7 @@ class PDFReportGenerator {
       top: 50,
       right: 50,
       bottom: 50,
-      left: 50
+      left: 50,
     };
   }
 
@@ -29,163 +30,144 @@ class PDFReportGenerator {
     this.yOffset = this.currentPage.getHeight() - this.margins.top;
   }
 
-  async generateReport(data) {
+  async generateReport(params) {
+    // Fetch data from backend
+    const data = await this.fetchReportData(params);
     await this.initialize();
-    
+
     // Header Section
     await this.addHeader();
-    
-    // Executive Summary
-    await this.addExecutiveSummary(data.summary);
-    
-    // Tank Status Section
-    await this.addTankStatusSection(data.tanks);
-    
-    // Alerts and Notifications
-    await this.addAlertsSection(data.alerts);
-    
-    // Consumption Analysis
-    await this.addConsumptionAnalysis(data.consumption);
-    
-    // Performance Metrics
-    await this.addPerformanceMetrics(data.metrics);
-    
-    // Trends and Patterns
-    await this.addTrendsSection(data.trends);
-    
-    // Recommendations
-    await this.addRecommendations(data.recommendations);
-    
+
+    // Dynamic Sections
+    if (data.summary) await this.addExecutiveSummary(data.summary);
+    if (data.tanks) await this.addTankStatusSection(data.tanks);
+    if (data.alerts) await this.addAlertsSection(data.alerts);
+    if (data.consumption) await this.addConsumptionAnalysis(data.consumption);
+    if (data.metrics) await this.addPerformanceMetrics(data.metrics);
+    if (data.trends) await this.addTrendsSection(data.trends);
+    if (data.recommendations) await this.addRecommendations(data.recommendations);
+
     // Footer
     await this.addFooter();
-    
+
     return await this.doc.save();
+  }
+
+  async fetchReportData(params) {
+    try {
+      const response = await axios.get('/reports/pdf/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching report data:', error);
+      throw new Error('No se pudo obtener los datos del reporte.');
+    }
   }
 
   async addHeader() {
     const { currentPage } = this;
-    const pageWidth = currentPage.getWidth();
-    
-    // Add logo
-    // Assuming logo is added here
-    
-    // Add report title
+
     currentPage.drawText('Informe de Estado del Sistema', {
       x: this.margins.left,
       y: this.yOffset,
       size: 24,
       font: this.boldFont,
-      color: rgb(0, 0, 0)
+      color: rgb(0, 0, 0),
     });
-    
+
     this.yOffset -= 40;
-    
-    // Add report metadata
+
     const date = new Date().toLocaleDateString('es-CL');
     currentPage.drawText(`Fecha de generación: ${date}`, {
       x: this.margins.left,
       y: this.yOffset,
       size: 12,
-      font: this.regularFont
+      font: this.regularFont,
     });
-    
+
     this.yOffset -= 30;
   }
 
   async addExecutiveSummary(summary) {
-    // Add section title
     this.currentPage.drawText('Resumen Ejecutivo', {
       x: this.margins.left,
       y: this.yOffset,
       size: 18,
-      font: this.boldFont
+      font: this.boldFont,
     });
-    
+
     this.yOffset -= 20;
-    
-    // Add summary content
+
     const summaryText = `
       Estado general del sistema: ${summary.systemStatus}
       Total de tanques monitoreados: ${summary.totalTanks}
       Alertas activas: ${summary.activeAlerts}
       Eficiencia operativa: ${summary.efficiency}%
     `;
-    
-    // Add text with proper wrapping
+
     this.addWrappedText(summaryText, 12);
   }
 
   async addTankStatusSection(tanks) {
-    // Add tanks table with status
     const headers = ['Tanque', 'Nivel', 'Estado', 'Última Actualización'];
-    const rows = tanks.map(tank => [
+    const rows = tanks.map((tank) => [
       tank.name,
       `${tank.level}%`,
       tank.status,
-      tank.lastUpdate
+      tank.lastUpdate,
     ]);
-    
+
     await this.addTable(headers, rows);
   }
 
   async addAlertsSection(alerts) {
-    // Add alerts summary and details
     const alertsByPriority = {
-      high: alerts.filter(a => a.priority === 'high'),
-      medium: alerts.filter(a => a.priority === 'medium'),
-      low: alerts.filter(a => a.priority === 'low')
+      high: alerts.filter((a) => a.priority === 'high'),
+      medium: alerts.filter((a) => a.priority === 'medium'),
+      low: alerts.filter((a) => a.priority === 'low'),
     };
-    
-    // Add alerts statistics
+
     await this.addAlertsStats(alertsByPriority);
-    
-    // Add recent alerts list
     await this.addRecentAlerts(alerts.slice(0, 5));
   }
 
   async addConsumptionAnalysis(consumption) {
-    // Add consumption patterns and analysis
     await this.addConsumptionGraphs(consumption);
     await this.addConsumptionStats(consumption);
   }
 
   async addPerformanceMetrics(metrics) {
-    // Add key performance indicators
     const kpis = [
-      {label: 'Disponibilidad del Sistema', value: `${metrics.uptime}%`},
-      {label: 'Precisión de Mediciones', value: `${metrics.accuracy}%`},
-      {label: 'Tiempo de Respuesta', value: `${metrics.responseTime}ms`}
+      { label: 'Disponibilidad del Sistema', value: `${metrics.uptime}%` },
+      { label: 'Precisión de Mediciones', value: `${metrics.accuracy}%` },
+      { label: 'Tiempo de Respuesta', value: `${metrics.responseTime}ms` },
     ];
-    
+
     await this.addKPISection(kpis);
   }
 
   async addTrendsSection(trends) {
-    // Add trend analysis and predictions
     await this.addTrendGraphs(trends);
     await this.addPredictions(trends.predictions);
   }
 
   async addRecommendations(recommendations) {
-    // Add system recommendations
     this.addBulletList('Recomendaciones', recommendations);
   }
 
   async addFooter() {
     const pageCount = this.doc.getPageCount();
-    
+
     for (let i = 0; i < pageCount; i++) {
       const page = this.doc.getPage(i);
       page.drawText(`Página ${i + 1} de ${pageCount}`, {
         x: page.getWidth() / 2,
         y: this.margins.bottom,
         size: 10,
-        font: this.regularFont
+        font: this.regularFont,
       });
     }
   }
 
-  // Helper methods
   async addWrappedText(text, fontSize, maxWidth = 500) {
     // Implementation for text wrapping
   }
@@ -194,8 +176,32 @@ class PDFReportGenerator {
     // Implementation for creating tables
   }
 
-  async addGraph(data, type, options = {}) {
-    // Implementation for adding graphs
+  async addAlertsStats(alertsByPriority) {
+    // Implementation for alerts statistics
+  }
+
+  async addRecentAlerts(alerts) {
+    // Implementation for recent alerts list
+  }
+
+  async addConsumptionGraphs(consumption) {
+    // Implementation for consumption graphs
+  }
+
+  async addConsumptionStats(consumption) {
+    // Implementation for consumption statistics
+  }
+
+  async addKPISection(kpis) {
+    // Implementation for key performance indicators
+  }
+
+  async addTrendGraphs(trends) {
+    // Implementation for trend graphs
+  }
+
+  async addPredictions(predictions) {
+    // Implementation for predictions
   }
 
   async addBulletList(title, items) {
@@ -203,5 +209,4 @@ class PDFReportGenerator {
   }
 }
 
-// Export the generator
 export default PDFReportGenerator;

@@ -22,6 +22,7 @@ const TankStatusDisplay = () => {
   const navigate = useNavigate();
 
   const estacionId = user?.estaciones?.[0]?.id;
+  const userRole = user?.tipo_usuario;
   
   const handleAnalysis = (tankId) => {
     navigate(`/analysis/${tankId}`, { 
@@ -256,22 +257,25 @@ const TankStatusDisplay = () => {
 
             {/* Botones de Acción */}
             <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => {
-                  setSelectedTankId(tank.id);
-                  setShowThresholdConfig(true);
-                }}
-                className="inline-flex items-center justify-center gap-2 px-3 py-2.5
-                          bg-[#292d35] hover:bg-[#31363f] 
-                          border border-[#2d3137]/30
-                          rounded-xl text-sm font-medium
-                          text-gray-300 hover:text-white
-                          transition-all duration-300
-                          hover:shadow-lg hover:shadow-black/20"
-              >
-                <Settings className="w-4 h-4" />
-                <span>Configurar</span>
-              </button>
+              {/* Mostrar el botón solo si el rol no es 'operador' */}
+              {userRole !== 'operador' && (
+                <button
+                  onClick={() => {
+                    setSelectedTankId(tank.id);
+                    setShowThresholdConfig(true);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-3 py-2.5
+                            bg-[#292d35] hover:bg-[#31363f] 
+                            border border-[#2d3137]/30
+                            rounded-xl text-sm font-medium
+                            text-gray-300 hover:text-white
+                            transition-all duration-300
+                            hover:shadow-lg hover:shadow-black/20"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Configurar</span>
+                </button>
+              )}
               <button
                 onClick={() => handleAnalysis(tank.id)}
                 className="inline-flex items-center justify-center gap-2 px-3 py-2.5

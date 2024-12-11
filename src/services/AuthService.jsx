@@ -20,6 +20,9 @@ const AuthService = {
         // Obtener información del usuario
         const userResponse = await axios.get(`${API_URL}/users/me/`);
         const userData = userResponse.data;
+
+        // Guardar el rol en localStorage
+        localStorage.setItem('tipo_usuario', userData.tipo_usuario);  // Guardamos el rol aquí
         
         // Obtener las estaciones a las que tiene acceso el usuario
         const stationResponse = await axios.get(`${API_URL}/estaciones/`, {
