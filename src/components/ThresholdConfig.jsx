@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
+import { X, Trash2, AlertTriangle } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -154,76 +155,74 @@ const ThresholdConfig = ({ tankId, onClose }) => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop con blur */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      {/* Overlay */}
+      <div 
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
+        onClick={onClose}
+      />
 
-      {/* Contenedor principal */}
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="relative w-full max-w-2xl transform rounded-2xl bg-[#1f2227] p-6 text-left shadow-xl transition-all border border-[#2d3137]/50">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+      {/* Modal Container */}
+      <div className="relative w-[520px] bg-[#1a1d21] rounded-2xl shadow-2xl border border-white/[0.05]">
+        {/* Header */}
+        <div className="border-b border-white/[0.05] bg-gradient-to-b from-white/[0.02] to-transparent p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">
                 Configurar Umbrales
               </h2>
-              <button
-                onClick={onClose}
-                className="rounded-full p-2 text-gray-400 hover:bg-gray-800 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                  <path d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
+              <p className="text-sm text-gray-400">
+                Ajusta los valores para las alertas
+              </p>
             </div>
-            <p className="mt-2 text-sm text-gray-400">
-              Ajusta los valores de los umbrales para generar alertas según los niveles de los tanques.
-            </p>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-gray-400 hover:text-gray-300 hover:bg-white/[0.05]"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
+        </div>
 
-          {/* Lista de Umbrales */}
-          <div className="space-y-6">
+        {/* Contenido Principal */}
+        <div className="p-4">
+          <div className="space-y-3">
             {thresholds.map((threshold) => (
-              <div key={threshold.id} className="bg-[#181a1f] rounded-xl p-4 border border-[#2d3137]/30">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="w-full sm:w-32">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getThresholdColor(threshold.tipo)} text-white`}>
-                      {threshold.tipo}
-                    </span>
-                  </div>
+              <div 
+                key={threshold.id} 
+                className="bg-[#1f2227] rounded-lg p-3 border border-white/[0.05]"
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`
+                    px-2.5 py-1 rounded-md text-xs font-medium w-20 text-center
+                    bg-gradient-to-r ${getThresholdColor(threshold.tipo)} 
+                    text-white
+                  `}>
+                    {threshold.tipo}
+                  </span>
                   
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <input
-                          type="range"
-                          min={thresholdConfig[threshold.tipo]?.min || 0}
-                          max={thresholdConfig[threshold.tipo]?.max || 100}
-                          value={tempValues[threshold.id] || 0}
-                          onChange={(e) =>
-                            handleSliderChange(
-                              threshold.id,
-                              threshold.tipo,
-                              parseFloat(e.target.value)
-                            )
-                          }
-                          className="w-full h-2 rounded-full appearance-none bg-gray-700 accent-blue-500
-                                   [&::-webkit-slider-thumb]:appearance-none
-                                   [&::-webkit-slider-thumb]:w-4
-                                   [&::-webkit-slider-thumb]:h-4
-                                   [&::-webkit-slider-thumb]:rounded-full
-                                   [&::-webkit-slider-thumb]:bg-blue-500
-                                   [&::-webkit-slider-thumb]:cursor-pointer
-                                   [&::-webkit-slider-thumb]:shadow-lg
-                                   [&::-webkit-slider-thumb]:shadow-blue-500/50"
-                        />
-                      </div>
-                      <div className="w-16 text-right">
-                        <span className="text-lg font-semibold text-gray-200">
-                          {tempValues[threshold.id] || 0}%
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex-1 flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={thresholdConfig[threshold.tipo]?.min || 0}
+                      max={thresholdConfig[threshold.tipo]?.max || 100}
+                      value={tempValues[threshold.id] || 0}
+                      onChange={(e) => handleSliderChange(
+                        threshold.id,
+                        threshold.tipo,
+                        parseFloat(e.target.value)
+                      )}
+                      className="flex-1 h-1.5 rounded-full appearance-none bg-[#292d35] 
+                               [&::-webkit-slider-thumb]:appearance-none
+                               [&::-webkit-slider-thumb]:w-3
+                               [&::-webkit-slider-thumb]:h-3
+                               [&::-webkit-slider-thumb]:rounded-full
+                               [&::-webkit-slider-thumb]:bg-blue-500
+                               [&::-webkit-slider-thumb]:cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-white w-12 text-right tabular-nums">
+                      {tempValues[threshold.id] || 0}%
+                    </span>
                   </div>
 
                   <button
@@ -231,11 +230,9 @@ const ThresholdConfig = ({ tankId, onClose }) => {
                       setThresholdToDelete(threshold.id);
                       setShowConfirmation(true);
                     }}
-                    className="p-2 rounded-full hover:bg-red-500/10 text-red-400 hover:text-red-500 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300"
                   >
-                    <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -244,19 +241,18 @@ const ThresholdConfig = ({ tankId, onClose }) => {
 
           {/* Agregar Nuevo Umbral */}
           {availableThresholds.length > 0 && (
-            <div className="mt-6 bg-[#181a1f] rounded-xl p-4 border border-[#2d3137]/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">
-                Agregar Nuevo Umbral
-              </h3>
+            <div className="mt-3 pt-3 border-t border-white/[0.05]">
               <div className="flex flex-wrap gap-2">
                 {availableThresholds.map((type) => (
                   <button
                     key={type}
                     onClick={() => handleAddThreshold(type)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium
-                              bg-gradient-to-r ${getThresholdColor(type)}
-                              text-white shadow-lg hover:shadow-xl
-                              transition-all duration-300 hover:scale-105`}
+                    className={`
+                      px-3 py-1.5 rounded-lg text-xs font-medium
+                      bg-gradient-to-r ${getThresholdColor(type)}
+                      text-white transition-all duration-200
+                      hover:scale-105 active:scale-95
+                    `}
                   >
                     {type}
                   </button>
@@ -264,19 +260,22 @@ const ThresholdConfig = ({ tankId, onClose }) => {
               </div>
             </div>
           )}
+        </div>
 
-          {/* Botones de Acción */}
-          <div className="mt-8 flex justify-end gap-3">
+        {/* Footer */}
+        <div className="border-t border-white/[0.05] bg-[#1f2227] p-4">
+          <div className="flex justify-end gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-[#181a1f] text-gray-400 hover:text-gray-200 border border-[#2d3137]/30 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] 
+                       text-gray-300 hover:text-white text-sm"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg
-                       hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
+              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600
+                       text-white text-sm hover:from-blue-600 hover:to-blue-700"
             >
               Guardar Cambios
             </button>
@@ -286,33 +285,34 @@ const ThresholdConfig = ({ tankId, onClose }) => {
 
       {/* Modal de Confirmación */}
       {showConfirmation && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-[#1f2227] rounded-2xl p-6 max-w-sm w-full mx-4 border border-[#2d3137]/50">
+        <div className="fixed inset-0 flex items-center justify-center z-[110]">
+          <div 
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm" 
+            onClick={() => setShowConfirmation(false)} 
+          />
+          <div className="relative w-[320px] bg-[#1a1d21] rounded-xl p-4 border border-white/[0.05]">
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-red-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                  <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
+              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-3">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-2">¿Eliminar umbral?</h3>
-              <p className="text-gray-400 text-center mb-6">
-                Esta acción no se puede deshacer y podría afectar las alertas configuradas.
+              <h3 className="text-lg font-semibold text-white mb-2">¿Eliminar umbral?</h3>
+              <p className="text-sm text-gray-400 text-center mb-4">
+                Esta acción no se puede deshacer.
               </p>
 
-              <div className="flex gap-3 w-full">
+              <div className="flex gap-2 w-full">
                 <button
                   onClick={() => setShowConfirmation(false)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-[#181a1f] text-gray-400 hover:text-gray-200
-                           border border-[#2d3137]/30 transition-colors"
+                  className="flex-1 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1]
+                           text-gray-300 hover:text-white text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={() => handleDeleteThreshold(thresholdToDelete)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600
-                           text-white shadow-lg hover:shadow-red-500/25 transition-all duration-300"
+                  className="flex-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600
+                           text-white text-sm hover:from-red-600 hover:to-red-700"
                 >
                   Eliminar
                 </button>

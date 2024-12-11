@@ -53,28 +53,33 @@ export const NotificationProvider = ({ children }) => {
     socket.onmessage = (event) => {
       const newNotification = JSON.parse(event.data);
       console.log('Nueva notificación recibida:', newNotification);
-
+    
       setNotifications(prev => {
-        // Verificar si la notificación ya existe
-        const exists = prev.some(n => n.id === newNotification.id);
-        
-        if (!exists) {
-          const formattedNotification = {
-            id: newNotification.id,
-            mensaje: newNotification.mensaje || `Alerta: ${newNotification.tipo} en Tanque ${newNotification.tanque_id}`,
-            fecha_envio: newNotification.fecha_envio || new Date().toISOString(),
-            fecha_lectura: null,
-            tipo: newNotification.tipo,
-            nivel_detectado: newNotification.nivel_detectado,
-            umbral: newNotification.umbral
-          };
-          
-          return [formattedNotification, ...prev];
+        // Verificación más estricta basada en el ID de la alerta
+        const isDuplicate = prev.some(n => n.alerta_id === newNotification.alerta_id);
+    
+        if (isDuplicate) {
+          console.log('Notificación duplicada detectada, ignorando. ID:', newNotification.alerta_id);
+          return prev;
         }
-        return prev;
+    
+        const formattedNotification = {
+          id: newNotification.id,
+          alerta_id: newNotification.alerta_id, // Asegurarnos de incluir el alerta_id
+          mensaje: newNotification.mensaje || `Alerta: ${newNotification.tipo} en Tanque ${newNotification.tanque_id}`,
+          fecha_envio: newNotification.fecha_envio || new Date().toISOString(),
+          fecha_lectura: null,
+          tipo: newNotification.tipo,
+          nivel_detectado: newNotification.nivel_detectado,
+          umbral: newNotification.umbral,
+          tanque_id: newNotification.tanque_id
+        };
+    
+        // Solo incrementar el contador si es una nueva notificación
+        setUnreadCount(prevCount => prevCount + 1);
+        
+        return [formattedNotification, ...prev];
       });
-
-      setUnreadCount(prev => prev + 1);
     };
 
     socket.onerror = (error) => {

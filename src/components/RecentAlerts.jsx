@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Bell, AlertTriangle, ArrowDown, ArrowUp, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -39,39 +40,71 @@ const RecentAlerts = ({ limit = 3, className = '' }) => {
   const getAlertIcon = (tipo) => {
     switch (tipo) {
       case 'CRITICO':
-        return '🔴';
+        return <AlertTriangle className="w-4 h-4" />;
       case 'BAJO':
-        return '⚠️';
+        return <ArrowDown className="w-4 h-4" />;
       case 'MEDIO':
-        return '⚡';
+        return <AlertCircle className="w-4 h-4" />;
       case 'ALTO':
-        return '⬆️';
+        return <ArrowUp className="w-4 h-4" />;
       case 'LIMITE':
-        return '🔝';
+        return <AlertCircle className="w-4 h-4" />;
       default:
-        return '✅';
+        return <CheckCircle2 className="w-4 h-4" />;
     }
   };
 
   const getAlertColor = (tipo, estado) => {
     if (estado === 'RESUELTA') {
-      return 'bg-gray-500/10 text-gray-400'; // Color para alertas resueltas
+      return {
+        container: 'bg-gray-500/5 hover:bg-gray-500/10 border border-gray-500/10',
+        text: 'text-gray-400',
+        icon: 'bg-gray-500/10 text-gray-400',
+        badge: 'bg-gray-500/10 text-gray-400'
+      };
     }
-    switch (tipo) {
-      case 'CRITICO':
-        return 'bg-red-500/10 text-red-400';
-      case 'BAJO':
-        return 'bg-yellow-500/10 text-yellow-400';
-      case 'MEDIO':
-        return 'bg-blue-500/10 text-blue-400';
-      case 'ALTO':
-        return 'bg-orange-500/10 text-orange-400';
-      case 'LIMITE':
-        return 'bg-purple-500/10 text-purple-400';
-      default:
-        return 'bg-green-500/10 text-green-400';
-    }
+    
+    const colors = {
+      CRITICO: {
+        container: 'bg-red-500/5 hover:bg-red-500/10 border border-red-500/10',
+        text: 'text-red-400',
+        icon: 'bg-red-500/10 text-red-400',
+        badge: 'bg-red-500/10 text-red-400'
+      },
+      BAJO: {
+        container: 'bg-yellow-500/5 hover:bg-yellow-500/10 border border-yellow-500/10',
+        text: 'text-yellow-400',
+        icon: 'bg-yellow-500/10 text-yellow-400',
+        badge: 'bg-yellow-500/10 text-yellow-400'
+      },
+      MEDIO: {
+        container: 'bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/10',
+        text: 'text-blue-400',
+        icon: 'bg-blue-500/10 text-blue-400',
+        badge: 'bg-blue-500/10 text-blue-400'
+      },
+      ALTO: {
+        container: 'bg-orange-500/5 hover:bg-orange-500/10 border border-orange-500/10',
+        text: 'text-orange-400',
+        icon: 'bg-orange-500/10 text-orange-400',
+        badge: 'bg-orange-500/10 text-orange-400'
+      },
+      LIMITE: {
+        container: 'bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10',
+        text: 'text-purple-400',
+        icon: 'bg-purple-500/10 text-purple-400',
+        badge: 'bg-purple-500/10 text-purple-400'
+      }
+    };
+
+    return colors[tipo] || {
+      container: 'bg-green-500/5 hover:bg-green-500/10 border border-green-500/10',
+      text: 'text-green-400',
+      icon: 'bg-green-500/10 text-green-400',
+      badge: 'bg-green-500/10 text-green-400'
+    };
   };
+
 
   const formatTime = (dateString) => {
     if (!dateString) return '';
@@ -98,66 +131,98 @@ const RecentAlerts = ({ limit = 3, className = '' }) => {
 
   if (loading) {
     return (
-      <div className="animate-pulse p-6 bg-[#1a1d21] rounded-[39px] shadow-[inset_-8px_8px_16px_#151719,inset_8px_-8px_16px_#1f2329]">
-        <div className="h-6 w-48 bg-gray-700 rounded mb-4"></div>
-        {[...Array(limit)].map((_, i) => (
-          <div key={i} className="h-12 bg-gray-700 rounded mb-3"></div>
-        ))}
+      <div className="bg-[#1a1d21]/70 backdrop-blur-xl rounded-3xl border border-white/[0.05] p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <Bell className="w-5 h-5 text-blue-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-white">
+            Alertas Recientes
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {[...Array(limit)].map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-16 rounded-xl bg-white/[0.02] border border-white/[0.05]"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-[#1a1d21] rounded-[39px] shadow-[inset_-8px_8px_16px_#151719,inset_8px_-8px_16px_#1f2329]">
-        <p className="text-red-400">{error}</p>
+      <div className="bg-[#1a1d21]/70 backdrop-blur-xl rounded-3xl border border-white/[0.05] p-6">
+        <div className="flex items-center justify-center h-40">
+          <p className="text-red-400 font-medium">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`p-6 bg-[#1a1d21] rounded-[39px] shadow-[inset_-8px_8px_16px_#151719,inset_8px_-8px_16px_#1f2329] ${className}`}>
-      <h3 className="text-white text-base md:text-lg font-semibold mb-4">
-        Alertas Recientes
-      </h3>
+    <div className="bg-[#1a1d21]/70 backdrop-blur-xl rounded-3xl border border-white/[0.05] p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+          <Bell className="w-5 h-5 text-blue-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-white">
+          Alertas Recientes
+        </h3>
+      </div>
+
       {alerts.length > 0 ? (
-        <ul className="text-gray-300 text-sm space-y-3">
+        <div className="space-y-3">
           {alerts.map((alert) => {
             const tipoUmbral = alert.tipo_umbral || alert.configuracion_umbral?.tipo;
+            const colors = getAlertColor(tipoUmbral, alert.estado);
+            
             return (
-              <li
+              <div
                 key={alert.id || Math.random()}
-                className={`p-3 rounded-xl transition-all duration-300 ${getAlertColor(tipoUmbral, alert.estado)}`}
+                className={`rounded-xl p-4 transition-all duration-300 ${colors.container}`}
               >
-                <div className="flex items-center gap-2">
-                  <span>{getAlertIcon(tipoUmbral)}</span>
-                  <div className="flex-1">
-                    <p className="font-medium flex items-center gap-2">
-                      <span>Tanque #{alert.tanque}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700/50">
-                        {tipoUmbral || 'Sin tipo'}
-                      </span>
-                    </p>
-                    <div className="text-xs mt-1">
-                      <span className="opacity-75">
-                        Nivel actual: {formatNumber(alert.nivel_detectado)}%
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg ${colors.icon} flex-shrink-0`}>
+                    {getAlertIcon(tipoUmbral)}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`font-medium truncate ${colors.text}`}>
+                          Tanque #{alert.tanque}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-lg ${colors.badge}`}>
+                          {tipoUmbral || 'Sin tipo'}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 flex-shrink-0">
+                        {alert.estado === 'RESUELTA' ? (
+                          <span className="text-green-400">Resuelta</span>
+                        ) : (
+                          formatTime(alert.fecha_generacion)
+                        )}
                       </span>
                     </div>
-                  </div>
-                  <div className="text-xs opacity-75">
-                    {alert.estado === 'RESUELTA' ? (
-                      <span className="text-green-500">Resuelta</span>
-                    ) : (
-                      formatTime(alert.fecha_generacion)
-                    )}
+                    
+                    <div className="mt-1 text-sm text-gray-400">
+                      Nivel actual: {formatNumber(alert.nivel_detectado)}%
+                    </div>
                   </div>
                 </div>
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       ) : (
-        <p className="text-gray-400 text-center p-4">No hay alertas recientes</p>
+        <div className="text-center py-8">
+          <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
+            <Bell className="w-6 h-6 text-blue-400" />
+          </div>
+          <p className="text-gray-400 font-medium">No hay alertas recientes</p>
+        </div>
       )}
     </div>
   );

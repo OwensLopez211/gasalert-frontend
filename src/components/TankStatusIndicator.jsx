@@ -5,6 +5,7 @@ import ThresholdConfig from "./ThresholdConfig";
 import FuelAnalysisPage from "../pages/FuelAnalysisPage";
 import { useNavigate } from 'react-router-dom';
 import Loader from "./Loader";
+import { Settings, Activity, Droplet, } from 'lucide-react';
 import './TankIndicator.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -123,14 +124,6 @@ const TankStatusDisplay = () => {
     };
   }, [updateTankData]);
 
-  const formatNumber = (number) => {
-    return number.toLocaleString('es-ES', {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-      useGrouping: true
-    });
-  };
-
   const neumorphicClass = `
     rounded-[24px] 
     bg-[#1a1d21]
@@ -153,182 +146,148 @@ const TankStatusDisplay = () => {
     if (nivel > 75) return {
       base: "#10B981",
       light: "#34D399",
-      dark: "#059669"
+      dark: "#059669",
+      bg: "from-green-500/10 to-green-500/5",
+      border: "border-green-500/20",
+      text: "text-green-400"
     };
     if (nivel > 40) return {
       base: "#F59E0B",
       light: "#FBBF24",
-      dark: "#D97706"
+      dark: "#D97706",
+      bg: "from-yellow-500/10 to-yellow-500/5",
+      border: "border-yellow-500/20",
+      text: "text-yellow-400"
     };
     return {
-      base: "#FF5A5A",     // Rojo más suave
-      light: "#FF6B6B",    // Rojo claro más cercano al base
-      dark: "#FF4444"      // Rojo oscuro más cercano al base
+      base: "#EF4444",
+      light: "#F87171",
+      dark: "#DC2626",
+      bg: "from-red-500/10 to-red-500/5",
+      border: "border-red-500/20",
+      text: "text-red-400"
     };
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-40"> {/* Ajusta la altura si es necesario */}
-        <Loader />
-      </div>
-    );
-  }
-  
-  if (error) return <div className="text-red-500">{error}</div>;
+  const formatNumber = (number, maxDecimals = 1) => {
+    return number.toLocaleString('es-ES', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: maxDecimals,
+      useGrouping: true
+    });
+  };
 
   return (
-    <div className={`${neumorphicClass} p-6 space-y-6`}>
-      <h2 className="text-white text-xl font-bold">
-        Estado Actual de los Tanques
-      </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+      {tanks.map((tank) => {
+        const nivel = tank.ultima_lectura
+          ? (tank.ultima_lectura.volumen / tank.capacidad_total) * 100
+          : 0;
+        const colors = getColor(nivel);
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {tanks.map((tank) => {
-          const nivel = tank.ultima_lectura
-            ? (tank.ultima_lectura.volumen / tank.capacidad_total) * 100
-            : 0;
-          const colors = getColor(nivel);
-
-          return (
-            <div
-              key={tank.id}
-              className={`
-                flex flex-col
-                min-h-[520px]
-                p-4
-                rounded-2xl
-                bg-[#1f2227]
-                shadow-[8px_8px_16px_#151719,-8px_-8px_16px_#292d35]
-                border border-[#232529]/50
-                transform hover:scale-[1.02]
-                transition-all duration-300
-              `}
-            >
-            
-              {/* Header con Nombre del Tanque */}
-              <div className="h-[60px] flex items-center justify-center">
-                <h3 className="text-white font-semibold text-lg text-center">
-                  {tank.nombre}
-                </h3>
-              </div>
-
-              {/* Contenedor del Indicador */}
-              <div className="h-[160px] flex justify-center items-center">
-                <div className="relative inline-block">
-                  <div
-                    className="relative bg-[#292d35] rounded-2xl overflow-hidden mx-auto"
-                    style={{
-                      height: "120px",
-                      width: "40px"
-                    }}
-                  >
-                    {nivel === 0 ? (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-gray-500 font-semibold transform -rotate-90 whitespace-nowrap text-sm tracking-wider">
-                          VACÍO
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className="liquid-container"
-                        style={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: `${nivel}%`,
-                          background: `linear-gradient(to bottom, ${colors.light} 10%, ${colors.base} 90%)`, // Ajustando los porcentajes del gradiente
-                          transition: 'height 0.8s ease-in-out',
-                          borderRadius: '0'
-                        }}
-                      >
-                        <div className="wave-top">
-                          <div 
-                            className="wave-curve"
-                            style={{ color: colors.base }}
-                          />
-                          <div 
-                            className="wave-curve wave2"
-                            style={{ color: colors.base }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+        return (
+          <div
+            key={tank.id}
+            className="bg-[#1f2227] rounded-2xl border border-[#2d3137]/30 p-5 flex flex-col min-h-[480px]"
+          >
+            {/* Cabecera del Tanque */}
+            <div className="flex flex-col space-y-1 mb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-semibold text-white truncate">
+                    {tank.nombre}
+                  </h3>
+                  <span className="text-sm text-gray-500">(Ficticio)</span>
                 </div>
-              </div>
-
-              {/* Información de Nivel y Volumen */}
-              <div className="h-[140px] flex flex-col items-center justify-center gap-2">
-                <div className="text-center">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-                    {nivel.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
-                  </span>
-                </div>
-                <div className="text-center">
-                  <span className="text-gray-400 text-sm">
-                    {tank.ultima_lectura 
-                      ? `${formatNumber(tank.ultima_lectura.volumen)} L`
-                      : "0,0 L"}
-                  </span>
-                </div>
-                <div className="text-gray-400 text-xs">
-                  Capacidad: {formatNumber(tank.capacidad_total)} L
-                </div>
-              </div>
-          
-
-              <div className="flex flex-col gap-2 mt-auto">
-                {/* Botón de Configuración */}
-                <button
-                  onClick={() => {
-                    setSelectedTankId(tank.id);
-                    setShowThresholdConfig(true);
-                  }}                  
-                  className={`
-                    w-full
-                    py-2
-                    rounded-xl
-                    font-medium
-                    text-sm
-                    transition-all
-                    duration-300
-                    bg-gradient-to-br from-[#3B82F6] to-[#2563EB] 
-                    text-white
-                    shadow-[4px_4px_8px_#151719,-4px_-4px_8px_#1f2329]
-                    hover:shadow-[6px_6px_12px_#151719,-6px_-6px_12px_#1f2329]
-                    hover:from-[#2563EB] hover:to-[#1D4ED8]
-                  `}
-                >
-                  Configurar
-                </button>
-
-                {/* Botón de Análisis */}
-                <button
-                  onClick={() => handleAnalysis(tank.id)}
-                  className={`
-                    w-full
-                    py-2
-                    rounded-xl
-                    font-medium
-                    text-sm
-                    transition-all
-                    duration-300
-                    bg-gradient-to-br from-[#2563EB] to-[#1D4ED8]
-                    text-white
-                    shadow-[4px_4px_8px_#151719,-4px_-4px_8px_#1f2329]
-                    hover:shadow-[6px_6px_12px_#151719,-6px_-6px_12px_#1f2329]
-                    hover:from-[#1D4ED8] hover:to-[#1E40AF]
-                  `}
-                >
-                  Ver Análisis
-                </button>
+                <span className={`${colors.text} font-semibold text-lg tabular-nums`}>
+                  {formatNumber(nivel)}%
+                </span>
               </div>
             </div>
-          );
-        })}
-      </div>
+
+            {/* Indicador de Nivel */}
+            <div className="flex justify-center my-6">
+              <div className="relative w-14">
+                <div className="relative bg-[#292d35] rounded-xl overflow-hidden h-[140px]">
+                  {nivel === 0 ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-gray-500 font-medium transform -rotate-90 whitespace-nowrap text-sm">
+                        VACÍO
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="liquid-container"
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: `${nivel}%`,
+                        background: `linear-gradient(to bottom, ${colors.light} 0%, ${colors.base} 100%)`,
+                        transition: 'height 0.8s ease-out',
+                      }}
+                    >
+                      <div className="wave-top">
+                        <div className="wave-curve" style={{ color: colors.base }} />
+                        <div className="wave-curve wave2" style={{ color: colors.base }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Información de Volumen */}
+            <div className="space-y-3 mb-6 flex-grow">
+              <div className="bg-[#292d35] rounded-xl p-3.5">
+                <span className="text-gray-400 text-sm block mb-1">Volumen Actual</span>
+                <span className="text-white font-medium text-lg tabular-nums">
+                  {formatNumber(tank.ultima_lectura?.volumen || 0)} L
+                </span>
+              </div>
+              <div className="bg-[#292d35] rounded-xl p-3.5">
+                <span className="text-gray-400 text-sm block mb-1">Capacidad Total</span>
+                <span className="text-white font-medium text-lg tabular-nums">
+                  {formatNumber(tank.capacidad_total)} L
+                </span>
+              </div>
+            </div>
+
+            {/* Botones de Acción */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  setSelectedTankId(tank.id);
+                  setShowThresholdConfig(true);
+                }}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2.5
+                          bg-[#292d35] hover:bg-[#31363f] 
+                          border border-[#2d3137]/30
+                          rounded-xl text-sm font-medium
+                          text-gray-300 hover:text-white
+                          transition-all duration-300
+                          hover:shadow-lg hover:shadow-black/20"
+              >
+                <Settings className="w-4 h-4" />
+                <span>Configurar</span>
+              </button>
+              <button
+                onClick={() => handleAnalysis(tank.id)}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2.5
+                          bg-gradient-to-r from-blue-500 to-blue-600
+                          hover:from-blue-600 hover:to-blue-700
+                          rounded-xl text-sm font-medium text-white
+                          transition-all duration-300
+                          hover:shadow-lg hover:shadow-blue-500/20"
+              >
+                <Activity className="w-4 h-4" />
+                <span>Análisis</span>
+              </button>
+            </div>
+          </div>
+        );
+      })}
 
       {showThresholdConfig && selectedTankId && (
         <ThresholdConfig
@@ -339,9 +298,6 @@ const TankStatusDisplay = () => {
           }}
         />
       )}
-
-
-    
     </div>
   );
 };
