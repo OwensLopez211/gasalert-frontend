@@ -21,7 +21,7 @@ const Layout = () => {
       {/* Contenido principal */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-1 overflow-auto p-8">
+        <main className="flex-1 overflow-auto pt-20"> {/* Added pt-20 for navbar spacing */}
           {/* Contenedor con efecto de glassmorphism para el contenido */}
           <div className="relative rounded-2xl backdrop-blur-sm bg-gray-950/30 border border-gray-800/50 shadow-xl">
             <Outlet />

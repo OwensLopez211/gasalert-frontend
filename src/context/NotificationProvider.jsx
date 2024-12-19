@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import NotificationToast from '../components/NotificationToast';
 
 const API_URL = process.env.REACT_APP_API_URL;
 const WS_URL = process.env.REACT_APP_WS_URL;
@@ -8,6 +9,8 @@ const NotificationContext = createContext();
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [activeToasts, setActiveToasts] = useState([]);
+
 
   // Cargar notificaciones iniciales
   useEffect(() => {
@@ -74,7 +77,10 @@ export const NotificationProvider = ({ children }) => {
           umbral: newNotification.umbral,
           tanque_id: newNotification.tanque_id
         };
-    
+        
+        // Mostrar el toast para la nueva notificación
+        setActiveToasts(prev => [...prev, formattedNotification]);
+
         // Solo incrementar el contador si es una nueva notificación
         setUnreadCount(prevCount => prevCount + 1);
         
@@ -100,6 +106,11 @@ export const NotificationProvider = ({ children }) => {
       }
     };
   }, []);
+
+  const removeToast = (notificationId) => {
+    setActiveToasts(prev => prev.filter(toast => toast.id !== notificationId));
+  };
+
 
   const markAsRead = async (notificationId) => {
     if (!notificationId) {
@@ -162,6 +173,16 @@ export const NotificationProvider = ({ children }) => {
       }}
     >
       {children}
+      {/* Render active toasts */}
+      <div className="fixed z-[9999] top-0 right-0 p-4 space-y-4">
+        {activeToasts.map((toast, index) => (
+          <NotificationToast
+            key={`${toast.id}-${index}`}
+            notification={toast}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
+      </div>
     </NotificationContext.Provider>
   );
 };
