@@ -42,9 +42,6 @@ npm start
 
 4. Abre el navegador y accede a `http://localhost:3000`
 
-## Estructura del proyecto
-
-Describe brevemente la estructura de carpetas y archivos del proyecto, explicando la función de cada una de las partes más importantes.
 
 ## Contribución
 
@@ -56,4 +53,4 @@ Si el proyecto está abierto a contribuciones, incluye información sobre cómo 
 
 ## Licencia
 
-Indica la licencia bajo la cual se distribuye el proyecto.
+MIT
